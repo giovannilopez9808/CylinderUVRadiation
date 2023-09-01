@@ -15,7 +15,7 @@ def get_TUV_information(
     wavelength, direct, diffuse = loadtxt(
         filename,
         max_rows=110,
-        skiprows=20,
+        skiprows=18,
         unpack=True,
         usecols=[
             0,
