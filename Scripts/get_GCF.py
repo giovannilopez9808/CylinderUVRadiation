@@ -1,3 +1,17 @@
+"""
+Modo de uso
+
+python get_GCF.py -t # --aspect #
+python get_GCF.py --tilt # --aspect #
+
+Si no se especifica el angulo tilt (t) o el angulo aspect (a), estos toman el
+valor predefinido que es 0
+
+Al termino de la ejecución se crea un archivo en la ruta
+
+../Results/GCF.csv
+"""
+
 from Modules.HayDavisModel import CylinderRadiation
 from Modules.TUV import get_TUV_information
 from Modules.SZAReader import SZAReader
