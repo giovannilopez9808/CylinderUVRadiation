@@ -264,8 +264,8 @@ class CylinderRadiation:
         """
         Rotacion del vector normal
         """
-        matrix = self.r3@self.r2@self.r1
-        self.normal_vector_rotated = matrix@self.normal_vector
+        rotation = self.r3@self.r2@self.r1
+        self.normal_vector_rotated = rotation@self.normal_vector
 
     def _get_incident_angle(
         self,
@@ -358,9 +358,13 @@ class CylinderRadiation:
         slope_rad = self._to_radian(
             slope
         )
+        # Razon entre la irradiancia solar horizontal y la irradiancia
+        # extraterrestre horizontal
         term1 = self.eb*cos(incident_angle_rad)
         term1 = term1/(self.eed*cos(sza_rad))
+        # Aportación del angulo zenital
         term2 = 0.5*(1+cos(slope_rad))
+        # Razon entre la irradiancia solar y la irradiancia extraterrestre
         term3 = self.eb/self.eed
         term = term1+term2-term3
         term *= diffuse_beam
