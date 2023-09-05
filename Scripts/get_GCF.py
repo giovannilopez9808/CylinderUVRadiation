@@ -20,6 +20,14 @@ from argparse import ArgumentParser
 from pandas import DataFrame
 from os.path import join
 
+
+def fill_number(number: int) -> str:
+    number = int(number)
+    number_s = str(number)
+    number_s = number_s.zfill(3)
+    return number_s
+
+
 parser = ArgumentParser()
 # Lectura del tilt por terminal
 parser.add_argument(
@@ -88,7 +96,9 @@ for date in dates:
 results["GCF"] = results["Ets"]/results["TUV"]
 results.index.name = "Date"
 # Nombre del archivo de guardado
-filename = "GCF.csv"
+tilt = fill_number(args.tilt)
+aspect = fill_number(args.aspect)
+filename = f"GCF_tilt_{tilt}_aspect_{aspect}.csv"
 filename = join(
     params["results_path"],
     filename
