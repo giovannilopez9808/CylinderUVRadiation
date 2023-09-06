@@ -1,0 +1,17 @@
+9.62 0.6 4.5 #(9.37hs)
+10.00 0.65 8
+10.52 1.2 10 #(10.31hs)
+11.07 1.55 14 #(11.04hs)
+11.53 2 16.5 #(11.32hs)
+12.03 2 22.5 #(12.02hs)
+12.56 2.35 21 #(12.347hs)
+12.98 1.9 19.5 #(12.59hs)
+13.60 2.25 20 #(13.36hs)
+14.06 1.75 18 #(14.04hs)
+14.60 1.4 14 #(14.36hs)
+15.00 1.35 13
+15.34 1.05 9.5 #(15.34hs)
+
+#Los datos corresponden al horario, UVA+UVB, y VIT D_3 medidas en: la terraza del IFIR.
+#Se descubrieron(post 12.59hs) problemas con la sombra generada por el "Digital UV meter" que alteraron las mediciones
+

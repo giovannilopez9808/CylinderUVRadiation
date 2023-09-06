@@ -1,0 +1,15 @@
+9.00 0.9 7 
+9.50 1.4 11 #(9.30 hs)
+10.00 2.3 19
+10.50 3.0 25.5 #(10.30 hs)
+11.03 4.1 37 #(11.02 hs)
+11.50 4.4 41 #(11.30 hs)
+12.08 4.45 44 #(12.05 hs)
+13.06 4.5 44 #(13.04 hs)
+13.10 4.6 46 #(13.06 hs)
+13.13 4.5 46 #(13.08 hs)
+13.16 4.4 46 #(13.10 hs)
+13.43 4.5 45 #(13.26 hs)
+
+#Los datos corresponden al horario, UVA+UVB, y VIT D_3 medidas en: la terraza del IFIR.
+#Cielo: despejado, cerca de las 12.30 se notaron nubes que pasaban sobre el sol y permanecieron hasta la última medición.
