@@ -11,10 +11,10 @@ params = get_params()
 params.update({
     "Graphics": {
         "0305med.dat": {
-            "color": "lightblue"
+            "color": "lightblue",
         },
         "1004med.dat": {
-            "color": "pink"
+            "color": "pink",
         },
         "1007med.dat": {
             "color": "blue",
@@ -56,7 +56,7 @@ for file in files:
         filename,
         unpack=True,
     )
-    # lum/min to W/m2
+    # UI/min to W/m2
     vit = vit*(210*4.3)/(3600*71)
     pyplot.plot(
         hours,
