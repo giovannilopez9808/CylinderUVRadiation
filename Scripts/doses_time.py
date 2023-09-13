@@ -10,6 +10,7 @@ from pandas import (
 from numpy import (
     loadtxt,
     arange,
+    array,
 )
 
 
@@ -31,10 +32,30 @@ def get_filenames(path: str) -> list:
     return files
 
 
+def get_second_resolution(
+    hours: array,
+    data: array,
+) -> tuple:
+    interpolation_data = interp1d(
+        hours,
+        data,
+    )
+    hours = arange(
+        12.5,
+        hours[-1]-delta,
+        delta
+    )
+    data = interpolation_data(
+        hours,
+    )
+    hours = hours*3600
+    return hours, data
+
+
 params = get_params()
 ESA10 = 0.202332235
 ESA30 = 0.6069967051
-delta = 1/60
+delta = 1/3600
 folder = join(
     params["data_path"],
     "MED"
@@ -42,8 +63,13 @@ folder = join(
 files = get_filenames(
     folder,
 )
+filename = "GCF_tilt_000_aspect_000.csv"
+filename = join(
+    params["results_path"],
+    filename,
+)
 GCF = read_csv(
-    "../Results/GCF_tilt_000_aspect_000.csv",
+    filename,
     index_col=0,
 )
 results = DataFrame(
@@ -51,7 +77,7 @@ results = DataFrame(
         "Time"
     ]
 )
-results.index.name = "Date"
+results.columns.name = "Date"
 for file in files:
     file = join(
         folder,
@@ -67,37 +93,37 @@ for file in files:
     GCF_daily = GCF.loc[date]
     GCF_daily = GCF_daily["GCF"]
     # acá pasamos de Iu/min a W/m2
-    vit = vit*((250*4.3)/(3600*71))
-    # Agregamos la sección dedicada a la interpolación:
-    vit_model = interp1d(
+    vit = vit*0.0035
+    vit = vit*GCF_daily
+    hours, vit = get_second_resolution(
         hours,
         vit,
     )
-    hours = arange(
-        12.5,
-        hours[-1]-delta,
-        delta
-    )
-    vit = vit_model(
-        hours
-    )
     Dosis = 0
     time = 1
-    while (Dosis < 400):
-        # a mano
+    while Dosis < 400:
         vit_t = vit[:time]
-        VitD = vit_t[1:]+vit_t[:-1]
-        VitD = VitD*delta/2
-        VitD = sum(VitD)*len(vit_t)**2
+        # a mano
+        VitD = sum(
+            (vit_t[1:]+vit_t[:-1])*delta/2
+        )
         # con scipy
         VitD = trapezoid(
             vit_t,
             hours[:time],
             dx=delta,
-        )*len(vit_t)**2
-        Dosis = 6153*GCF_daily*VitD*ESA10/250
-        time += 1
-    time = (hours[time]-hours[0])*60
+        )
+        Dosis = VitD*ESA10*6153/250
+        time += 60
+    time = (hours[time]-hours[0])/60
     results.loc[date] = time
 results = results.sort_index()
+filename = "Doses_time.csv"
+filename = join(
+    params["results_path"],
+    filename
+)
+results.to_csv(
+    filename,
+)
 print(results)
