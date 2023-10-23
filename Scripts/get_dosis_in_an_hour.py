@@ -1,3 +1,4 @@
+from scipy.interpolate import CubicSpline
 from scipy.interpolate import interp1d
 from scipy.integrate import trapezoid
 from Modules.params import get_params
@@ -37,13 +38,16 @@ def get_second_resolution(
     hours: array,
     data: array,
 ) -> tuple:
-    interpolation_data = interp1d(
+    interpolation_data = CubicSpline(
+        # interpolation_data = interp1d(
         hours,
         data,
+        # fill_value="extrapolate"
     )
+    hour_f = 13.5
     hours = arange(
         12.5,
-        hours[-1]-delta,
+        hour_f-delta,
         delta
     )
     data = interpolation_data(
@@ -51,6 +55,12 @@ def get_second_resolution(
     )
     hours = hours*3600
     return hours, data
+
+
+def decimal_hour_to_hhmm(hour: float) -> str:
+    hour_ = int(hour)
+    minute = int(hour % 1*60)+1
+    return f"{hour_}:{minute}"
 
 
 parser = ArgumentParser()
@@ -72,6 +82,7 @@ params.update({
 })
 esa = params["ESA"][args.esa]
 delta = 1/3600
+time = 3600
 folder = join(
     params["data_path"],
     "MED"
@@ -88,10 +99,12 @@ GCF = read_csv(
     filename,
     index_col=0,
 )
+columns = list(
+    params["phototypes"].keys()
+)
+# columns += ["Final time"]
 results = DataFrame(
-    columns=[
-        "Time"
-    ]
+    columns=columns,
 )
 results.columns.name = "Date"
 for file in files:
@@ -109,32 +122,29 @@ for file in files:
     GCF_daily = GCF.loc[date]
     GCF_daily = GCF_daily["GCF"]
     # acá pasamos de Iu/min a W/m2
-    vit = vit*0.0035
-    vit = vit*GCF_daily
     hours, vit = get_second_resolution(
         hours,
         vit,
     )
-    Dosis = 0
-    time = 1
-    while Dosis < 400:
-        vit_t = vit[:time]
-        # a mano
-        VitD = sum(
-            (vit_t[1:]+vit_t[:-1])*delta/2
+    vit = vit*0.0035
+    vit = vit*GCF_daily
+    vit_t = vit[:time]
+    VitD = trapezoid(
+        vit_t,
+        hours[:time],
+        dx=delta,
+    )
+    hour_f = decimal_hour_to_hhmm(hours[-1]/3600)
+    # results.loc[date, "Final time"] = hour_f
+    for phototype, med in params["phototypes"].items():
+        Dosis = VitD*esa*6153/med
+        results.loc[date, phototype] = round(
+            Dosis,
+            1
         )
-        # con scipy
-        VitD = trapezoid(
-            vit_t,
-            hours[:time],
-            dx=delta,
-        )
-        Dosis = VitD*esa*6153/250
-        time += 60
-    time = (hours[time]-hours[0])/60
-    results.loc[date] = time
 results = results.sort_index()
-filename = f"Doses_time_esa_{args.esa}.csv"
+print(results/400)
+filename = f"Doses_in_one_hour_esa_{args.esa}.csv"
 filename = join(
     params["results_path"],
     filename
@@ -142,4 +152,3 @@ filename = join(
 results.to_csv(
     filename,
 )
-print(results)
